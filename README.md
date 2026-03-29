@@ -43,7 +43,7 @@ This project was built with that positive lens in mind. The goal was never to hi
 Two questions drive this project:
 
 **Relationships & Gender**
-- Is the gender pay gap correlated with marriage and divorce trends across European countries?
+
 - Is the gap between male and female age at first marriage narrowing over time?
 
 **Gender Gap at Work**
