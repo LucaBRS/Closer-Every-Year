@@ -43,7 +43,7 @@ This project was built with that positive lens in mind. The goal was never to hi
 Two questions drive this project:
 
 **Relationships & Gender**
-
+- Is the gender pay gap correlated with marriage and divorce trends across European countries?
 - Is the gap between male and female age at first marriage narrowing over time?
 
 **Gender Gap at Work**
@@ -81,9 +81,6 @@ flowchart TD
 Both pipelines share the same asset code. Local uses **DuckDB**, cloud uses **BigQuery**.
 Bruin handles orchestration, dependency resolution, and materialization for both.
 
----
-## Cloud lineage pipeline build with bruin
-![Bruin Lineage Pipeline](docs/img/lineage-data-pipeline.png)
 ---
 
 ## Tech Stack
@@ -229,7 +226,7 @@ with duckdb.connect("data/duckdb.db") as conn:
 cp .env.example .env
 ```
 
-See `.env.example` for the required variables (`GOOGLE_CREDENTIALS`, `GCP_PROJECT_ID`, `GCS_BUCKET`).
+See `.env.example` for the required variables (`GOOGLE_CREDENTIALS`, `GCP_PROJECT_ID`, `GCS_BUCKET`, `TF_VAR_project_id`, `TF_VAR_bucket`, `TF_VAR_region`).
 
 **2. Start the containers**
 
