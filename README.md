@@ -234,6 +234,16 @@ See `.env.example` for the required variables (`GOOGLE_CREDENTIALS`, `GCP_PROJEC
 docker compose up -d
 ```
 
+**3. Create the Terraform state bucket** (one-time, manual):
+
+```bash
+gcloud storage buckets create gs://tf-state-zoomcamp \
+  --project=YOUR_PROJECT_ID \
+  --location=EU
+```
+
+This bucket stores the Terraform state remotely so that both local and CI runs stay in sync. It must exist before running `terraform init`.
+
 **4. Apply Terraform** (creates GCS bucket + BigQuery datasets + tables):
 
 ```bash
