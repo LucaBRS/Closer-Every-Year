@@ -82,6 +82,9 @@ Both pipelines share the same asset code. Local uses **DuckDB**, cloud uses **Bi
 Bruin handles orchestration, dependency resolution, and materialization for both.
 
 ---
+Cloud lineage pipeline build with bruin
+![Bruin Lineage Pipeline](docs/img/lineage-data-pipeline.png)
+---
 
 ## Tech Stack
 
