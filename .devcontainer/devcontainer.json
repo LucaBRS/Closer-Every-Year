@@ -1,0 +1,15 @@
+{
+  "name": "Bruin Dev",
+  "dockerComposeFile": "../docker-compose.yml",
+  "service": "bruin",
+  "workspaceFolder": "/workspace",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "bruin.bruin",
+        "anthropic.claude-code",
+        "streetsidesoftware.code-spell-checker",
+      ]
+    }
+  }
+}

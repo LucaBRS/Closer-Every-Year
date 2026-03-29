@@ -1,0 +1,5 @@
+name: eurostat_gcp_pipeline
+schedule: "@daily"
+concurrency: 1
+default_connections:
+  google_cloud_platform: "gcp_conn"

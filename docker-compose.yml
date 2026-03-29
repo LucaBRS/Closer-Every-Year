@@ -1,0 +1,39 @@
+services:
+
+  bruin:
+    env_file:
+      - .env
+    build:
+      context: .
+      dockerfile: Dockerfile.bruin
+    # image: ghcr.io/bruin-data/bruin:v0.11.493
+
+    container_name: bruin-pipeline
+    working_dir: /workspace
+    volumes:
+      - ./.git:/workspace/.git
+      - ./.gitignore:/workspace/.gitignore
+      - ./pyproject.toml:/workspace/pyproject.toml
+      - ./.bruin.yml:/workspace/.bruin.yml
+      - ./local-pipeline:/workspace/local-pipeline
+      - ./gcp-pipeline:/workspace/gcp-pipeline
+      - ./data:/workspace/data
+    environment:
+      - BRUIN_ENV=local
+      - UV_PROJECT_ENVIRONMENT=/home/bruin/workspace/.venv
+    command: tail -f /dev/null
+    stdin_open: true
+    tty: true
+
+
+  terraform:
+    env_file:
+      - .env
+    image: hashicorp/terraform:latest
+    container_name: terraform
+    working_dir: /workspace
+    volumes:
+      - ./terraform:/workspace
+    stdin_open: true
+    tty: true
+    entrypoint: tail -f /dev/null

@@ -1,0 +1,58 @@
+name: Run GCP Pipeline
+
+on:
+  schedule:
+    - cron: '0 8 1 1 *'   # 1 January
+    - cron: '0 8 1 7 *'   # 1 July
+  workflow_dispatch:        # manual trigger from Actions tab
+
+jobs:
+  run-pipeline:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Create .env
+        env:
+          GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+        run: |
+          echo "GCP_PROJECT_ID=${{ vars.GCP_PROJECT_ID }}" >> .env
+          echo "GCS_BUCKET=${{ vars.GCS_BUCKET }}" >> .env
+          echo "GOOGLE_CREDENTIALS=$GOOGLE_CREDENTIALS" >> .env
+
+      - name: Create .bruin.yml
+        env:
+          BRUIN_YML: ${{ secrets.BRUIN_YML }}
+        run: echo "$BRUIN_YML" > .bruin.yml
+
+      - name: Fix file permissions
+        run: sudo chmod -R 777 .git .gitignore
+
+      - name: Debug .env
+        run: |
+          echo "GCP_PROJECT_ID=$(grep GCP_PROJECT_ID .env | cut -d= -f2)"
+          echo "GCS_BUCKET=$(grep GCS_BUCKET .env | cut -d= -f2)"
+          echo "GOOGLE_CREDENTIALS length=$(grep GOOGLE_CREDENTIALS .env | wc -c)"
+          echo "GOOGLE_CREDENTIALS starts with: $(grep GOOGLE_CREDENTIALS .env | cut -c1-50)"
+
+      - name: Debug .bruin.yml
+        run: cat .bruin.yml
+
+      - name: Start containers
+        run: docker compose up -d --build
+
+      - name: Debug inside container
+        run: |
+          echo "GCP_PROJECT_ID=$(docker exec bruin-pipeline printenv GCP_PROJECT_ID)"
+          echo "GOOGLE_CREDENTIALS length=$(docker exec bruin-pipeline printenv GOOGLE_CREDENTIALS | wc -c)"
+          echo "GOOGLE_CREDENTIALS starts with: $(docker exec bruin-pipeline printenv GOOGLE_CREDENTIALS | cut -c1-50)"
+
+
+      - name: Run pipeline
+        run: docker exec bruin-pipeline bruin run --environment cloud gcp-pipeline
+
+      - name: Tear down
+        if: always()
+        run: docker compose down

@@ -1,0 +1,46 @@
+name: Terraform Apply
+
+on:
+  workflow_dispatch:        # manual trigger only
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Create .env
+        env:
+          GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+        run: |
+          echo "GCP_PROJECT_ID=${{ vars.GCP_PROJECT_ID }}" >> .env
+          echo "GCS_BUCKET=${{ vars.GCS_BUCKET }}" >> .env
+          echo "GOOGLE_CREDENTIALS=$GOOGLE_CREDENTIALS" >> .env
+          echo "TF_VAR_project_id=${{ vars.GCP_PROJECT_ID }}" >> .env
+          echo "TF_VAR_region=${{ vars.TF_VAR_region }}" >> .env
+          echo "TF_VAR_bucket=${{ vars.TF_VAR_bucket }}" >> .env
+
+      - name: Debug .env
+        run: |
+          echo "GCP_PROJECT_ID=$(grep GCP_PROJECT_ID .env | cut -d= -f2)"
+          echo "GCS_BUCKET=$(grep GCS_BUCKET .env | cut -d= -f2)"
+          echo "GOOGLE_CREDENTIALS length=$(grep GOOGLE_CREDENTIALS .env | wc -c)"
+          echo "GOOGLE_CREDENTIALS starts with: $(grep GOOGLE_CREDENTIALS .env | cut -c1-50)"
+          echo "TF_VAR_project_id=$(grep TF_VAR_project_id .env | cut -d= -f2)"
+          echo "TF_VAR_region=$(grep TF_VAR_region .env | cut -d= -f2)"
+          echo "TF_VAR_bucket=$(grep TF_VAR_bucket .env | cut -d= -f2)"
+
+      - name: Start Terraform container
+        run: docker compose up -d terraform
+
+      - name: Terraform init
+        run: docker exec terraform terraform init
+
+      - name: Terraform apply
+        run: docker exec terraform terraform apply -auto-approve
+
+      - name: Tear down
+        if: always()
+        run: docker compose down

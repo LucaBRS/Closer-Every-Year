@@ -1,0 +1,16 @@
+default_environment: local
+
+environments:
+  local:
+    connections:
+      duckdb:
+        - name: "main_db"
+          path: "data/duckdb.db"
+
+  cloud:
+    connections:
+      google_cloud_platform:
+        - name: "gcp_conn"
+          project_id: "${GCP_PROJECT_ID}"
+          location: "EU"
+          service_account_json: "${GOOGLE_CREDENTIALS}"

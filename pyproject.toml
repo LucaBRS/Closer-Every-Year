@@ -1,0 +1,22 @@
+[project]
+name = "datatalksclublearning"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "duckdb>=1.5.1",
+    "eurostat>=1.1.1",
+    "gcsfs>=2026.2.0",
+    "google-cloud-bigquery>=3.40.1",
+    "google-cloud-storage>=3.10.1",
+    "pandas>=3.0.1",
+    "pandas-gbq>=0.34.1",
+    "pyarrow>=23.0.1",
+    "requests>=2.32.5",
+]
+
+[dependency-groups]
+dev = [
+    "jupyterlab>=4.5.6",
+]
