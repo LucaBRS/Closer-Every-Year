@@ -14,3 +14,14 @@ variable "bucket" {
   type        = string
 }
 
+variable "billing_account_id" {
+  description = "GCP Billing Account ID — set via TF_VAR_billing_account_id in .env"
+  type        = string
+}
+
+variable "budget_amount" {
+  description = "Monthly budget limit in EUR before alert triggers"
+  type        = number
+  default     = 5
+}
+
