@@ -350,6 +350,7 @@ Manual: GitHub Actions → Run workflow
 | `GCS_BUCKET` | Variable | Your GCS bucket path (e.g. `gs://my-bucket`) |
 | `TF_VAR_bucket` | Variable | GCS bucket name without `gs://` prefix |
 | `TF_VAR_region` | Variable | GCP region (e.g. `EU`) |
+| `TF_VAR_billing_account_id` | Variable | GCP Billing Account ID (e.g. `XXXXXX-XXXXXX-XXXXXX`) — run `gcloud billing accounts list` |
 
 ---
 
