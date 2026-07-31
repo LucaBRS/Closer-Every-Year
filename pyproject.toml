@@ -5,6 +5,8 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "dbt-core>=1.12.0",
+    "dbt-duckdb>=1.10.1",
     "duckdb>=1.5.1",
     "eurostat>=1.1.1",
     "gcsfs>=2026.2.0",
