@@ -1,0 +1,14 @@
+version: 2
+
+sources:
+  - name: bronze
+    database: dev
+    schema: bronze
+    tables:
+      - name: divorce_rate
+      - name: marriage_rate
+      - name: age_at_marriage
+      - name: accidents
+      - name: employed
+      - name: gender_pay_gap
+      - name: hours_worked
