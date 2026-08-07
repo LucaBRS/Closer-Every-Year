@@ -53,6 +53,11 @@ def bronze_ingestion():
             SELECT * FROM read_parquet('{DATA_PATH}/{output_name}.parquet')
         """)
 
+
+    # DONE_WHY: The DAG tasks call the Eurostat API (eurostat), read/write Parquet (pandas, pyarrow),
+    # and write to DuckDB (duckdb)
+    #  this for will create 7 different pipelines, each with its own tasks.
+    #  The tasks are independent of each other, and can run in parallel.
     for output_name, dataset_code in DATASETS.items():
         parquet_name = download_parquet.override(task_id=f"download_{output_name}")(
             output_name, dataset_code
