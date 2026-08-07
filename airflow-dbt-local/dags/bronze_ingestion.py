@@ -65,6 +65,8 @@ def bronze_ingestion():
         # DONE_WHY: DuckDB allows only one writer connection at a time on a single file.
         # Running load_* tasks in parallel causes lock conflicts, so they're pinned to a
         # 1-slot pool to force them to run one at a time while downloads stay parallel.
+        # this `docker compose run --rm airflow-cli pools set duckdb_writer 1 "serializes writes to dev.duckdb"` will create the pool of 1 slot
+        # this `docker compose run --rm airflow-cli pools list` will list the pools
         load_to_duckdb.override(task_id=f"load_{output_name}", pool="duckdb_writer")(
             parquet_name
         )
