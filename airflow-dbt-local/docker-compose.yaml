@@ -88,6 +88,10 @@ x-airflow-common:
     # both to you on the host and to the *other* containers (e.g. a future dbt task needs the
     # same dev.duckdb file the ingestion task just wrote).
     - ${AIRFLOW_PROJ_DIR:-.}/data:/opt/airflow/data
+    # DONE_WHY: the dbt project (dbt_project.yml, models/, macros/, profiles.yml) lives on
+    # the host under dbt/airflow_dbt_local/ but is invisible to the container without this
+    # mount — the dbt_build task needs it to run `dbt build` from inside the worker.
+    - ${AIRFLOW_PROJ_DIR:-.}/dbt:/opt/airflow/dbt
   user: "${AIRFLOW_UID:-50000}:0"
   depends_on:
     &airflow-common-depends-on

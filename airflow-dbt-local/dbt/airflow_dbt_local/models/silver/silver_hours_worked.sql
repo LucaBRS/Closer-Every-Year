@@ -21,6 +21,8 @@ select
     country,
     year,
     sum(case when sex = 'M' then hours_worked end) as hours_worked_m,
-    sum(case when sex = 'F' then hours_worked end) as hours_worked_f
+    sum(case when sex = 'F' then hours_worked end) as hours_worked_f,
+        AVG(CASE WHEN sex = 'M' THEN hours_worked END)
+        - AVG(CASE WHEN sex = 'F' THEN hours_worked END) AS hours_worked_delta
 from unpivoted_clean_cte
 group by country, year

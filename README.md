@@ -7,6 +7,8 @@
 ![BigQuery](https://img.shields.io/badge/Warehouse-BigQuery-669DF6?logo=googlebigquery&logoColor=white)
 ![Docker](https://img.shields.io/badge/Container-Docker-2496ED?logo=docker&logoColor=white)
 ![Power BI](https://img.shields.io/badge/Dashboard-PowerBI-F2C811?logo=powerbi&logoColor=black)
+![Airflow](https://img.shields.io/badge/Orchestration-Airflow-017CEE?logo=apacheairflow&logoColor=white)
+![dbt](https://img.shields.io/badge/Transformation-dbt-FF694B?logo=dbt&logoColor=white)
 
 A batch data pipeline tracking **gender gap indicators** and **relationship trends** (marriage, divorce, age at first marriage) across European countries from 2005 to 2024.
 
@@ -29,6 +31,7 @@ Built as capstone project for the [DataTalksClub Data Engineering Zoomcamp 2026]
 - [How to Run](#how-to-run)
 - [CI/CD](#cicd)
 - [Project Structure](#project-structure)
+- [Alternative Stack: Airflow + dbt (Docker Sandbox)](#alternative-stack-airflow--dbt-docker-sandbox)
 - [Dashboard](#dashboard)
 - [Bruin AI Data Analyst](#bruin-ai-data-analyst)
 - [Notes](#notes)
@@ -389,6 +392,57 @@ Manual: GitHub Actions → Run workflow
 
 ---
 
+## Alternative Stack: Airflow + dbt (Docker Sandbox)
+
+The Bruin pipeline above is the production implementation, but the same problem was rebuilt end-to-end with the more traditional **decoupled** Data Engineering stack — Airflow for orchestration, dbt for transformation — as a self-contained learning sandbox. It lives entirely under `airflow-dbt-local/`, fully independent from the Bruin pipeline (own DuckDB file, own Docker Compose stack), and demonstrates the same medallion architecture (bronze → silver → gold) with a different set of tools.
+
+```mermaid
+flowchart TD
+    A[Eurostat API] -->|7 datasets, parallel| B["download_* tasks\n(Airflow, Python)"]
+    B --> C["load_* tasks\n(Airflow, pool-serialized\nDuckDB writes)"]
+    C -->|bronze.*| D["dbt build\n(silver: cleaned + unpivoted + tested)"]
+    D -->|silver_*| E["dbt build\n(gold: joined marts)"]
+    E --> F[(dev.duckdb)]
+```
+
+### Why a Second Implementation
+
+Bruin bundles ingestion, transformation and scheduling into one tool — great for velocity, but not what most companies run today. This sandbox demonstrates the more commonly expected stack: an orchestrator (Airflow) coordinating discrete steps, with a dedicated transformation tool (dbt) doing the SQL layer — each swappable independently (e.g. DuckDB → BigQuery by changing a dbt target, nothing else).
+
+### Pipeline
+
+One Airflow DAG (`bronze_ingestion.py`), 15 tasks:
+
+1. **`download_*`** (× 7, parallel) — pulls each Eurostat dataset to Parquet, with retry on empty responses
+2. **`load_*`** (× 7, serialized via a 1-slot Airflow Pool) — loads each Parquet file into `bronze.*` in DuckDB. Serialized because DuckDB allows only one writer connection at a time — running these in parallel raises a file lock error
+3. **`dbt_build`** (fan-in on all 7 `load_*` tasks, same pool) — runs `dbt build` inside the same container, materializing silver and gold and running all tests
+
+### dbt Project (`airflow-dbt-local/dbt/airflow_dbt_local/`)
+
+| Layer | Contents |
+|---|---|
+| `models/source/sources.yml` | Declares `bronze.*` (populated by Airflow) as dbt sources |
+| `models/silver/` | 7 models — one per dataset, unpivoted from wide (year columns) to long via a shared macro, filtered to real 2-letter country codes (drops Eurostat aggregates like `EU27_2020`) |
+| `models/gold/` | 2 marts — `gold_gender_gap` and `gold_relationships` — joining multiple silver models on `(country, year)` |
+| `macros/unpivot_wide_years.sql` | Reusable macro: introspects a source table's columns at compile time and generates the wide→long `UNION ALL`, so every silver model shares one implementation instead of repeating the pivot logic |
+
+**46 dbt tests** across silver and gold: `not_null` on keys, `dbt_utils.accepted_range` on measures, `dbt_utils.expression_is_true` for country-code length, `dbt_utils.unique_combination_of_columns` on `(country, year)` at the gold grain to catch join fan-out.
+
+### Running It
+
+```bash
+cd airflow-dbt-local
+docker compose build
+docker compose up airflow-init
+docker compose up -d
+docker compose run --rm airflow-cli dags test bronze_ingestion 2026-01-01
+```
+UI at `localhost:8080` (`airflow` / `airflow`).
+
+> Full list of issues hit building this (DuckDB write locks, dbt partial-parse cache mismatches between host and container, relative-path resolution inside Docker, VS Code extension quirks) is in [docs/troubleshooting.md](docs/troubleshooting.md#20-stale-venv-points-to-a-python-that-no-longer-exists).
+
+---
+
 ## Dashboard
 
 Built with **Power BI**, connected directly to BigQuery (`analytics.relationships` and `analytics.gender_gap`).
@@ -434,3 +488,4 @@ Analysis performed using the Bruin AI agent directly on the BigQuery analytics t
 - See [docs/troubleshooting.md](docs/troubleshooting.md) for common errors and fixes
 - Notebooks in `notebooks/` are for EDA only and are not part of the production pipeline
 - The pipeline runs inside Docker — always ensure Docker Desktop is running before executing any command
+- `airflow-dbt-local/` is a separate, independent sandbox (own DuckDB, own Docker stack) — see [Alternative Stack: Airflow + dbt](#alternative-stack-airflow--dbt-docker-sandbox)

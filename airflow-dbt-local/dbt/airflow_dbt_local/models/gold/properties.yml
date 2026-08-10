@@ -1,0 +1,34 @@
+version: 2
+
+models:
+  - name: gold_gender_gap
+    description: Gender-related labour metrics by country and year, joining hours worked, gender pay gap, accidents and employment from silver models.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - country
+              - year
+    columns:
+      - name: country
+        tests:
+          - not_null
+      - name: year
+        tests:
+          - not_null
+
+  - name: gold_relationships
+    description: Relationship metrics by country and year, joining marriage rate, divorce rate, age at marriage and gender pay gap from silver models.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - country
+              - year
+    columns:
+      - name: country
+        tests:
+          - not_null
+      - name: year
+        tests:
+          - not_null
