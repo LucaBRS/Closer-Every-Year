@@ -439,6 +439,10 @@ docker compose run --rm airflow-cli dags test bronze_ingestion 2026-01-01
 ```
 UI at `localhost:8080` (`airflow` / `airflow`).
 
+[![Airflow DAG](docs/img/airflow-dag-local.png)](docs/img/airflow-dag-local.png)
+
+*`bronze_ingestion` DAG in the Airflow UI — 7 parallel download/load pairs fanning into a single `dbt_build` task.*
+
 > Full list of issues hit building this (DuckDB write locks, dbt partial-parse cache mismatches between host and container, relative-path resolution inside Docker, VS Code extension quirks) is in [docs/troubleshooting.md](docs/troubleshooting.md#20-stale-venv-points-to-a-python-that-no-longer-exists).
 
 ---
