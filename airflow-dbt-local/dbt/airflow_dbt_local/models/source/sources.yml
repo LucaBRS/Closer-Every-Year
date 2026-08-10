@@ -1,7 +1,7 @@
 version: 2
 
 sources:
-  - name: bronze
+  - name: source
     database: dev
     schema: bronze
     tables:

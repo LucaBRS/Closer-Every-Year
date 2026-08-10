@@ -1,0 +1,27 @@
+version: 2
+
+models:
+  - name: silver_accidents
+    description: Accidents at work by country and year, split into male/female columns, unpivoted from bronze.accidents.
+    tests:
+      - dbt_utils.expression_is_true:
+          expression: "length(country) <= 3"
+    columns:
+      - name: country
+        tests:
+          - not_null
+      - name: year
+        tests:
+          - not_null
+      - name: accidents_m
+        description: Accidents count for sex = 'M'. Null if no male rows exist for that country/year.
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              inclusive: true
+      - name: accidents_f
+        description: Accidents count for sex = 'F'. Null if no female rows exist for that country/year.
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              inclusive: true
