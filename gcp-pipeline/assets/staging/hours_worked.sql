@@ -13,8 +13,13 @@ columns:
   - name: year
     primary_key: true
   - name: hours_worked_m
+    checks:
+      - name: non_negative
   - name: hours_worked_f
+    checks:
+      - name: non_negative
   - name: hours_worked_delta
+    description: "hours_worked_m - hours_worked_f — can be negative when women work more hours than men on average"
 @bruin */
 
 SELECT

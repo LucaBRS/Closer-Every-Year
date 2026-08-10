@@ -13,7 +13,11 @@ columns:
   - name: year
     primary_key: true
   - name: employed_m
+    checks:
+      - name: non_negative
   - name: employed_f
+    checks:
+      - name: non_negative
 @bruin */
 
 SELECT

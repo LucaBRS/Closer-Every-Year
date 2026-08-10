@@ -13,6 +13,7 @@ columns:
   - name: year
     primary_key: true
   - name: gender_pay_gap
+    description: "% pay gap — can be negative in countries/years where women earn more than men on average"
 @bruin */
 
 SELECT t.country, t.year, t.gender_pay_gap

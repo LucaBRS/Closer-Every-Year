@@ -6,6 +6,17 @@ depends:
   - load.age_at_marriage
 materialization:
   type: table
+columns:
+  - name: country
+    primary_key: true
+  - name: year
+    primary_key: true
+  - name: age_at_marriage_f
+    checks:
+      - name: non_negative
+  - name: age_at_marriage_m
+    checks:
+      - name: non_negative
 @bruin */
 SELECT
 country,

@@ -219,14 +219,18 @@ Two final tables, both **partitioned by `year_date`** and **clustered by `countr
 
 ## Data Quality Checks
 
-Bruin runs quality checks **automatically after each asset materialises**. If any check fails, the pipeline halts and downstream assets do not execute — preventing bad data from reaching the dashboard.
+Bruin runs quality checks **automatically after each asset materialises**. If any check fails, the pipeline halts and downstream assets do not execute — preventing bad data from reaching the dashboard. Checks live at the **staging layer**, one per dataset, so bad data is caught before it ever reaches `analytics.*`.
 
 | Asset | Checks |
 |---|---|
-| `stg_relationships` | `not_null` (country, year, marriage_rate, divorce_rate) · `unique` (country, year) |
-| `stg_gender_gap` | `not_null` (country, year, sex, hours_worked) · `non_negative` (employed_m, employed_f, accidents_m, accidents_f) |
-| `analytics.relationships` | `not_null + unique` (country, year_date) · `not_null` (gender_pay_gap, age_at_marriage_f, age_at_marriage_m) |
-| `analytics.gender_gap` | `not_null + unique` (country, year_date) · `non_negative` (hours_worked_m, hours_worked_f) · `not_null` (hours_worked_delta) |
+| `staging.marriage_rate` | `primary_key` (country, year) · `non_negative` (marriage_rate) |
+| `staging.divorce_rate` | `primary_key` (country, year) · `non_negative` (divorce_rate) |
+| `staging.age_at_marriage` | `primary_key` (country, year) · `non_negative` (age_at_marriage_f, age_at_marriage_m) |
+| `staging.gender_pay_gap` | `primary_key` (country, year) — no `non_negative`: the gap is legitimately negative when women out-earn men on average |
+| `staging.hours_worked` | `primary_key` (country, year) · `non_negative` (hours_worked_m, hours_worked_f) — not on `hours_worked_delta`, which can be negative |
+| `staging.accidents` | `primary_key` (country, year) · `non_negative` (accidents_m, accidents_f) |
+| `staging.employed` | `primary_key` (country, year) · `non_negative` (employed_m, employed_f) |
+| `analytics.relationships` / `analytics.gender_gap` | `primary_key` (country, year) — grain/uniqueness guaranteed by the merge; measure quality is already enforced upstream at staging |
 
 ---
 

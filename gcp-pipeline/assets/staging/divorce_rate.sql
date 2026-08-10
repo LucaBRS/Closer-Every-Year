@@ -13,6 +13,8 @@ columns:
   - name: year
     primary_key: true
   - name: divorce_rate
+    checks:
+      - name: non_negative
 @bruin */
 
 SELECT d.country, d.year, d.divorce_rate
