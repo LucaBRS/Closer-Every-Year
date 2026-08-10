@@ -1,23 +1,13 @@
-{% set cols = adapter.get_columns_in_relation(source("source", "accidents")) %}
-{% set exclude = ["freq", "unit", "nace_r2", "sex", "country"] %}
-{% set year_cols = cols | map(attribute="name") | reject("in", exclude) | list %}
-
 with
     unpivoted_cte as (
-        {% for col in year_cols %}
-            select country, sex, nace_r2, '{{ col }}' as year, "{{ col }}" as accidents
-            from {{ source("source", "accidents") }}
-            {% if not loop.last %}
-                union all
-            {% endif %}
-        {% endfor %}
+        {{ unpivot_wide_years('source', 'accidents', ['country', 'sex', 'nace_r2'], ['freq', 'unit'], 'accidents') }}
     ),
     unpivoted_clean_cte as (
         select
             country,
             sex,
             nace_r2,
-            cast(replace(year, '_', '') as integer) as year,
+            year,
             accidents
         from unpivoted_cte
         where sex in ('M', 'F') and nace_r2 = 'TOTAL' and accidents is not null

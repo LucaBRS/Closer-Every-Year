@@ -5,7 +5,7 @@ models:
     description: Accidents at work by country and year, split into male/female columns, unpivoted from bronze.accidents.
     tests:
       - dbt_utils.expression_is_true:
-          expression: "length(country) <= 3"
+          expression: "length(country) <= 2"
     columns:
       - name: country
         tests:
@@ -24,4 +24,133 @@ models:
         tests:
           - dbt_utils.accepted_range:
               min_value: 0
+              inclusive: true
+  - name: silver_divorce_rate
+    description: Divorce rate by country and year, unpivoted from bronze.divorce_rate.
+    tests:
+      - dbt_utils.expression_is_true:
+          expression: "length(country) <= 2"
+    columns:
+      - name: country
+        tests:
+          - not_null
+      - name: year
+        tests:
+          - not_null
+      - name: divorce_rate
+        description: Divorce rate between 0 and 100 or null if no data.
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 100
+              inclusive: true
+
+  - name: silver_marriage_rate
+    description: Marriage rate by country and year, unpivoted from bronze.marriage_rate.
+    tests:
+      - dbt_utils.expression_is_true:
+          expression: "length(country) <= 2"
+    columns:
+      - name: country
+        tests:
+          - not_null
+      - name: year
+        tests:
+          - not_null
+      - name: marriage_rate
+        description: Marriage rate, or null if no data.
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              inclusive: true
+
+  - name: silver_age_at_marriage
+    description: Average age at first marriage by country and year, unpivoted from bronze.age_at_marriage.
+    tests:
+      - dbt_utils.expression_is_true:
+          expression: "length(country) <= 2"
+    columns:
+      - name: country
+        tests:
+          - not_null
+      - name: year
+        tests:
+          - not_null
+      - name: age_at_marriage
+        description: Average age at first marriage, or null if no data.
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              inclusive: true
+
+  - name: silver_gender_pay_gap
+    description: Gender pay gap (%) by country and year, unpivoted from bronze.gender_pay_gap.
+    tests:
+      - dbt_utils.expression_is_true:
+          expression: "length(country) <= 2"
+    columns:
+      - name: country
+        tests:
+          - not_null
+      - name: year
+        tests:
+          - not_null
+      - name: gender_pay_gap
+        description: Gender pay gap as a percentage. Can be negative (women earning more than men on average), or null if no data.
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: -50
+              max_value: 100
+              inclusive: true
+
+  - name: silver_employed
+    description: Employed persons (thousands) by country and year, split into male/female columns, filtered to age Y_GE15 and nace_r2 TOTAL, unpivoted from bronze.employed.
+    tests:
+      - dbt_utils.expression_is_true:
+          expression: "length(country) <= 2"
+    columns:
+      - name: country
+        tests:
+          - not_null
+      - name: year
+        tests:
+          - not_null
+      - name: employed_m
+        description: Employed persons (thousands) for sex = 'M'. Null if no male rows exist for that country/year.
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              inclusive: true
+      - name: employed_f
+        description: Employed persons (thousands) for sex = 'F'. Null if no female rows exist for that country/year.
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              inclusive: true
+
+  - name: silver_hours_worked
+    description: Average hours worked per week by country and year, split into male/female columns, filtered to age Y_GE15, nace_r2 TOTAL, wstatus EMP and worktime TOTAL, unpivoted from bronze.hours_worked.
+    tests:
+      - dbt_utils.expression_is_true:
+          expression: "length(country) <= 2"
+    columns:
+      - name: country
+        tests:
+          - not_null
+      - name: year
+        tests:
+          - not_null
+      - name: hours_worked_m
+        description: Average hours worked per week for sex = 'M'. Null if no male rows exist for that country/year.
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 168
+              inclusive: true
+      - name: hours_worked_f
+        description: Average hours worked per week for sex = 'F'. Null if no female rows exist for that country/year.
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 168
               inclusive: true
