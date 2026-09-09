@@ -6,7 +6,7 @@
 ![Bruin](https://img.shields.io/badge/Orchestration-Bruin-0F766E)
 ![BigQuery](https://img.shields.io/badge/Warehouse-BigQuery-669DF6?logo=googlebigquery&logoColor=white)
 ![Docker](https://img.shields.io/badge/Container-Docker-2496ED?logo=docker&logoColor=white)
-![Power BI](https://img.shields.io/badge/Dashboard-PowerBI-F2C811?logo=powerbi&logoColor=black)
+
 ![Airflow](https://img.shields.io/badge/Orchestration-Airflow-017CEE?logo=apacheairflow&logoColor=white)
 ![dbt](https://img.shields.io/badge/Transformation-dbt-FF694B?logo=dbt&logoColor=white)
 
